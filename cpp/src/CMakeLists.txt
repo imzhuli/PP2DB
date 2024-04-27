@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project (pp2db_apps)
+set(libname pp2db)
 
 message(STATUS ${X_INCLUDE_DIRS})
 message(STATUS ${X_LIBRARY_DIRS})
@@ -40,17 +41,32 @@ aux_source_directory(./common_mysql COMMON_SRC)
 aux_source_directory(./common_job   COMMON_SRC)
 aux_source_directory(./lib          LIB_SRC)
 
-add_library(pp2db SHARED ${LIB_SRC} ${COMMON_SRC})
-target_compile_definitions(pp2db PRIVATE X_OPTION_STATIC)
+add_library(${libname} SHARED ${LIB_SRC} ${COMMON_SRC})
+target_compile_definitions(${libname} PRIVATE X_OPTION_STATIC)
 
 function(build_app sub_dir_name)
 	aux_source_directory(${sub_dir_name} LOCAL_SOURCE_CODE)
 	add_executable(_${sub_dir_name} ${LOCAL_SOURCE_CODE})
 	target_compile_definitions(_${sub_dir_name} PRIVATE X_OPTION_STATIC)
-	target_link_libraries(_${sub_dir_name} PRIVATE pp2db ${lib_dependency})
+	target_link_libraries(_${sub_dir_name} PRIVATE ${libname} ${lib_dependency})
 endfunction()
 
 build_app(xexample)
+
+install(
+	DIRECTORY ${PROJECT_SOURCE_DIR}/_include/
+	DESTINATION include
+	FILES_MATCHING
+		PATTERN "*.h"
+		PATTERN "*.hpp"
+	)
+
+install(TARGETS
+	${libname}
+	RUNTIME DESTINATION bin
+	ARCHIVE DESTINATION lib
+	LIBRARY DESTINATION lib
+	)
 
 install(TARGETS
 	_xexample

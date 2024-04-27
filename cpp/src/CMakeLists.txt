@@ -41,7 +41,7 @@ aux_source_directory(./common_mysql COMMON_SRC)
 aux_source_directory(./common_job   COMMON_SRC)
 aux_source_directory(./lib          LIB_SRC)
 
-add_library(${libname} SHARED ${LIB_SRC} ${COMMON_SRC})
+add_library(${libname} ${LIB_SRC} ${COMMON_SRC})
 target_compile_definitions(${libname} PRIVATE X_OPTION_STATIC)
 
 function(build_app sub_dir_name)

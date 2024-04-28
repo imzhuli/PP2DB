@@ -131,7 +131,18 @@ namespace pp2db {
 		RuntimeAssert(
 			StmtQueryStaticIp.Init(C, "select proxy_ip,is_udp from t_static_alloc where account=? and password=? and proxy_status = 0")
 		);
-		while (auto QP = static_cast<xQueryBase *>(JobQueue.WaitForJob())) {
+
+		while (true) {
+			auto QP       = static_cast<xQueryBase *>(nullptr);
+			auto HasEvent = JobQueue.WaitForJobTimeout(QP, 1000);
+			if (!HasEvent) {
+				C.Tick();
+				continue;
+			}
+			if (!QP) {  // quit event
+				break;
+			}
+
 			switch (QP->Cmd) {
 				case eCmd::QUERY_STATIC_IP: {
 					auto ProxyIp      = std::string();

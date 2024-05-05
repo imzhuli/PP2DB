@@ -69,12 +69,12 @@ namespace pp2db {
 		JobQueue.GrabJobList(UnPostJobList);
 
 		size_t UnprocessedCounter = 0;
-		for (auto & N : L) {
-			delete &N;
+		while (auto NP = L.PopHead()) {
+			delete NP;
 			++UnprocessedCounter;
 		}
-		for (auto & N : UnPostJobList) {
-			delete &static_cast<xQueryBase &>(N);
+		while (auto NP = UnPostJobList.PopHead()) {
+			delete static_cast<xQueryBase *>(NP);
 			++UnprocessedCounter;
 		}
 		Touch(UnprocessedCounter);
@@ -116,10 +116,10 @@ namespace pp2db {
 			auto G = xSpinlockGuard(ResultLock);
 			L.GrabListTail(ResultList);
 		} while (false);
-		for (auto & N : L) {
-			auto RP = N.GetResult();
-			N.CB(N.CC, RP);
-			delete &N;
+		while (auto NP = L.PopHead()) {
+			auto RP = NP->GetResult();
+			NP->CB(NP->CC, RP);
+			delete NP;
 		}
 	}
 

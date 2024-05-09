@@ -5,7 +5,7 @@
 #include <mutex>
 
 // constexpr
-static constexpr const int64_t IDLE_TIMEOUT_MS = 120'000;
+static constexpr const int64_t IDLE_TIMEOUT_MS = 5 * 60'000;
 
 // global
 static auto   InitMutex   = std::mutex();
@@ -121,8 +121,7 @@ void xMySqlConn::Tick(uint64_t NowMS) {
 		return;
 	}
 
-	// Select 1:
-	X_DEBUG_PRINTF("DO SELECT 1");
+	// X_DEBUG_PRINTF("DO SELECT 1");
 	auto Conn = (MYSQL *)NativeHandle.Get();
 	do {
 		if (mysql_query(Conn, "SELECT 1")) {

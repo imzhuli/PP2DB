@@ -15,14 +15,20 @@ if not ce.check_env():
 x_path = ""
 try:
     argv = sys.argv[1:]
-    opts, args = getopt.getopt(argv, "x:")
+    opts, args = getopt.getopt(argv, "rx:")
 except getopt.GetoptError:
     sys.exit(2)
 for opt, arg in opts:
     if opt == "-x":
         x_path = os.path.abspath(arg)
         print("xlib path: %s" % (x_path))
+    if opt == '-r':
+        os.environ["PS_BUILD_CONFIG_TYPE"] = "Release"
     pass
+
+if os.getenv("PS_BUILD_CONFIG_TYPE") is None:
+    os.environ["PS_BUILD_CONFIG_TYPE"]="Debug"
+build_type=os.getenv("PS_BUILD_CONFIG_TYPE")
 
 if not os.path.isdir(x_path):
     print("x_path not found")
@@ -44,5 +50,5 @@ os.system(
     'cmake -Wno-dev '
     f'-DX_LIB={x_path!r} '
     f'-DCMAKE_INSTALL_PREFIX={full_install_dir!r} -B {build_path!r} {src_dir!r}')
-os.system(f"cmake --build {build_path} -- all")
-os.system(f"cmake --build {build_path} -- install")
+os.system(f"cmake --build {build_path} --config {build_type} -- all")
+os.system(f"cmake --install {build_path} --config {build_type}")
